@@ -1,4 +1,5 @@
-<%php
+<?php
+
 require_once 'API.class.php';
 
 class MyAPI extends API {
@@ -8,10 +9,11 @@ class MyAPI extends API {
         parent::__construct($request);
 
         // Abstracted out for example
-        $APIKey = new Models\APIKey();
-        $User = new Models\User();
+        //$APIKey = new Models\APIKey();
+        //$User = new Models\User();
 
-        if (!array_key_exists('apiKey', $this->request)) {
+        /*
+		if (!array_key_exists('apiKey', $this->request)) {
             throw new Exception('No API Key provided');
         } else if (!$APIKey->verifyKey($this->request['apiKey'], $origin)) {
             throw new Exception('Invalid API Key');
@@ -21,7 +23,8 @@ class MyAPI extends API {
             throw new Exception('Invalid User Token');
         }
 
-        $this->User = $User;
+        $this->User = $User; 
+		*/
     }
 
     /**
@@ -29,10 +32,26 @@ class MyAPI extends API {
      */
      protected function example() {
         if ($this->method == 'GET') {
-            return "Your name is " . $this->User->name;
+            return array("exercises" => array("a" => "orange", "b" => "banana", "c" => "apple"));
         } else {
             return "Only accepts GET requests";
         }
      }
+	 
+	 /*  require_once '../includes/config.php'; // The mysql database connection script
+  $status = '%';
+  if (isset($_GET['status'])) {
+    $status = $_GET['status'];
+  }
+  $query = "select ID, TASK, STATUS from tasks where status like '$status' order by status,id desc";
+  $result = $mysqli->query($query) or die($mysqli->error.__LINE__);
+
+  $arr = array();
+  if($result->num_rows > 0) {
+   while($row = $result->fetch_assoc()) {
+   $arr[] = $row;
+   }
+  }
+*/
  }
-%>
+?>
