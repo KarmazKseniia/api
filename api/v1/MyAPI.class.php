@@ -29,9 +29,27 @@ class MyAPI extends API {
         $this->User = $User; 
 		*/
     }
-
+	
+	/**
+	 * /api/v1/workout/list 		GET - список всех тренировок.
+	 * /api/v1/workout/list/me 		GET - список моих тренировок.
+	 * /api/v1/workout/{{id}} 		GET - взять конкретную тренировку.
+	 * /api/v1/workout/ 			POST - создать тренировку.
+	 * /api/v1/workout/{{id}} 		POST - добавить тренировку в аккаунт.
+	 * /api/v1/workout/{{id}} 		PUT - изменить тренировку.
+	 * /api/v1/workout/{{id}} 		DELETE - удалить тренировку из аккаунта.
+	 * /api/v1/workout/{{id}}/{{workoutId}} POST - добавить упражнения одной тренировки в другую.
+	 */
+	 protected function workout() {
+        
+     }
+	 
     /**
-     * /api/v1/exercise
+	 * /api/v1/exercise/list		GET - взять все упражнения.
+	 * /api/v1/exercise/list/me		GET - взять все упражнения из аккаунта.
+	 * /api/v1/exercise/{{id}} 		GET - взять конкретное упражнение.
+	 * /api/v1/exercise/{{id}}/{{workoutId}} POST - добавить упражнение в тренировку.
+	 * /api/v1/exercise/{{id}}/{{workoutId}} DELETE - удалить упражнение из тренировки.
      */
      protected function exercise() {
         if ($this->method == 'GET') {
@@ -52,5 +70,12 @@ class MyAPI extends API {
             return "Only accepts GET requests";
         }
      }
+	 		 
+	/**
+	 * sport_type=1&muscule_group=2
+	 */
+	 private function filter() {
+	 
+	 }
  }
 ?>
