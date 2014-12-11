@@ -41,7 +41,13 @@ class MyAPI extends API {
 			   SELECT * FROM exercise
 			   WHERE category = :category');
 			 
-			return $this.$pdo->execute($params);
+			$result = $this.$pdo->execute($params);
+			$result->setFetchMode(PDO::FETCH_CLASS, 'Exercise');
+			 
+			while ($exercise = $result->fetch()) {
+			   return $exercise->info();
+			}
+			return '';
         } else {
             return "Only accepts GET requests";
         }
