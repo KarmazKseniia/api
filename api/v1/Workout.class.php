@@ -6,9 +6,5 @@ class Workout {
 	public $goal; 		// text
 	public $cover; 		// url string
 	// $sportTypeIds и $muscleGroupIds формируются на основе входящих в нее упражнений / тренировок.
- 
-	public function info() {
-		return '#'.$this->id.': '.$this->title;
-	}
 }
 ?>

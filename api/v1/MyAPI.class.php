@@ -2,6 +2,11 @@
 require_once 'config.php';
 require_once 'API.class.php';
 
+require_once 'Exercise.class.php';
+require_once 'ImageExercise.class.php';
+require_once 'VideoExercise.class.php';
+require_once 'Workout.class.php';
+
 class MyAPI extends API {
     protected $User;
 	protected $pdo;
@@ -9,7 +14,7 @@ class MyAPI extends API {
     public function __construct($request, $origin) {
         parent::__construct($request);
 
-		$this.$pdo = connect();
+		$this->pdo = connect();
 		
         // Abstracted out for example
         //$APIKey = new Models\APIKey();
@@ -53,22 +58,41 @@ class MyAPI extends API {
      */
      protected function exercise() {
         if ($this->method == 'GET') {
-			$params = array(':category' => 'test');
- 
-			$this.$pdo->prepare('
-			   SELECT * FROM exercise
-			   WHERE category = :category');
-			 
-			$result = $this.$pdo->execute($params);
-			$result->setFetchMode(PDO::FETCH_CLASS, 'Exercise');
-			 
-			while ($exercise = $result->fetch()) {
-			   return $exercise->info();
+			//  /api/v1/exercise/list/me
+			if ($this->args[0] == "me") {
+				return "me";
+			} 
+			
+			//  /api/v1/exercise/list
+			if ($this->verb == 'list') {
+			
+				$params = array(':id' => '1');
+				
+				$stmt = $this->pdo->prepare('
+				   SELECT * FROM exercise');
+				   //WHERE id = :id');
+				 
+				$stmt->execute($params);
+				$result = $stmt->fetchAll(PDO::FETCH_CLASS, 'Exercise');
+				
+				return $result;
 			}
-			return '';
-        } else {
-            return "Only accepts GET requests";
+			
+			//  /api/v1/exercise/{{id}} 
+			if ($this->args[0]) {
+				return $this->args[0];
+			}
+			
+			return error("404.2");
+        } else if ($this->method == 'POST') {
+			//   /api/v1/exercise/{{id}}/{{workoutId}}
+         
+		} else if ($this->method == 'DELETE') {
+			//   /api/v1/exercise/{{id}}/{{workoutId}}
+            
         }
+		
+		return error("404.2");
      }
 	 		 
 	/**
