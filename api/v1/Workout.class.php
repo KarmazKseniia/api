@@ -1,10 +1,10 @@
 <?php
 class Workout {
-	public $id;			// unsigned long
-	public $exercises; 	// [Exercise] // при добавлении другого Workout, копируются айдишники всех упражнений
-	public $title; 		// text
+	public $id;			// unsigned bigint
+	public $title; 		// varchar 255
+	//public $exercises; 	// [Exercise] // при добавлении другого Workout, копируются айдишники всех упражнений
 	public $goal; 		// text
-	public $cover; 		// url string
+	public $cover; 		// varchar 255
 	// $sportTypeIds и $muscleGroupIds формируются на основе входящих в нее упражнений / тренировок.
 }
 ?>
