@@ -2,6 +2,7 @@
 require_once 'config.php';
 require_once 'API.class.php';
 
+require_once 'Product.class.php';
 require_once 'Exercise.class.php';
 require_once 'ImageExercise.class.php';
 require_once 'VideoExercise.class.php';
@@ -35,6 +36,40 @@ class MyAPI extends API {
 		*/
     }
 	
+	protected function product() {
+		if ($this->method == 'GET') {
+			if ($this->verb == 'list') {
+			
+				//  /api/v1/product/list
+				
+				$stmt = $this->pdo->prepare('
+				   SELECT * FROM product');
+				 
+				$stmt->execute();
+				$result = $stmt->fetchAll(PDO::FETCH_CLASS, 'Product');
+				
+				return $result;
+			}
+			
+			//  /api/v1/product/{{id}} 
+			if ($this->args[0]) {
+				$params = array(':id' => $this->args[0]);
+				
+				$stmt = $this->pdo->prepare('
+				   SELECT * FROM product
+				   WHERE id = :id');
+				 
+				$stmt->execute($params);
+				$result = $stmt->fetchAll(PDO::FETCH_CLASS, 'Product');
+				
+				return $result;
+			}
+			
+        }
+		
+		error("404.2");
+	}
+	
 	/**
 	 * /api/v1/workout/list 		GET - список всех тренировок.
 	 * /api/v1/workout/list/me 		GET - список моих тренировок.
@@ -55,13 +90,10 @@ class MyAPI extends API {
 				} 
 				
 				//  /api/v1/workout/list
-				$params = array(':id' => '1');
-				
 				$stmt = $this->pdo->prepare('
 				   SELECT * FROM workout');
-				   //WHERE id = :id');
 				 
-				$stmt->execute($params);
+				$stmt->execute();
 				$result = $stmt->fetchAll(PDO::FETCH_CLASS, 'Workout');
 				
 				return $result;
@@ -69,7 +101,16 @@ class MyAPI extends API {
 			
 			//  /api/v1/workout/{{id}} 
 			if ($this->args[0]) {
-				return $this->args[0];
+				$params = array(':id' => $this->args[0]);
+				
+				$stmt = $this->pdo->prepare('
+				   SELECT * FROM workout
+				   WHERE id = :id');
+				 
+				$stmt->execute($params);
+				$result = $stmt->fetchAll(PDO::FETCH_CLASS, 'Workout');
+				
+				return $result;
 			}
 			
         } else if ($this->method == 'POST') {
@@ -118,13 +159,10 @@ class MyAPI extends API {
 				} 
 				
 				//  /api/v1/exercise/list
-				$params = array(':id' => '1');
-				
 				$stmt = $this->pdo->prepare('
 				   SELECT * FROM exercise');
-				   //WHERE id = :id');
 				 
-				$stmt->execute($params);
+				$stmt->execute();
 				$result = $stmt->fetchAll(PDO::FETCH_CLASS, 'Exercise');
 				
 				return $result;
@@ -132,7 +170,16 @@ class MyAPI extends API {
 			
 			//  /api/v1/exercise/{{id}} 
 			if ($this->args[0]) {
-				return $this->args[0];
+				$params = array(':id' => $this->args[0]);
+				
+				$stmt = $this->pdo->prepare('
+				   SELECT * FROM exercise
+				   WHERE id = :id');
+				 
+				$stmt->execute($params);
+				$result = $stmt->fetchAll(PDO::FETCH_CLASS, 'Exercise');
+				
+				return $result;
 			}
 			
         } else if ($this->method == 'POST') {
