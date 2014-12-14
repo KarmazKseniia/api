@@ -46,7 +46,59 @@ class MyAPI extends API {
 	 * /api/v1/workout/{{id}}/{{workoutId}} POST - добавить упражнения одной тренировки в другую.
 	 */
 	 protected function workout() {
-        
+        if ($this->method == 'GET') {
+			if ($this->verb == 'list') {
+			
+				//  /api/v1/workout/list/me
+				if ($this->args[0] == "me") {
+					return "me";
+				} 
+				
+				//  /api/v1/workout/list
+				$params = array(':id' => '1');
+				
+				$stmt = $this->pdo->prepare('
+				   SELECT * FROM workout');
+				   //WHERE id = :id');
+				 
+				$stmt->execute($params);
+				$result = $stmt->fetchAll(PDO::FETCH_CLASS, 'Workout');
+				
+				return $result;
+			}
+			
+			//  /api/v1/workout/{{id}} 
+			if ($this->args[0]) {
+				return $this->args[0];
+			}
+			
+        } else if ($this->method == 'POST') {
+			if ($this->args[0]) {
+				
+				//   /api/v1/workout/{{id}}/{{workoutId}}
+				if ($this->args[1]) {
+					return 'copy to workout';
+				}
+				
+				//   /api/v1/workout/{{id}}
+				return 'add workout to account';
+			}
+			//   /api/v1/workout/
+			return 'create workout';
+         
+		} else if ($this->method == 'PUT') {
+			if ($this->args[0]) {
+			
+				//   /api/v1/workout/{{id}}
+			}
+         
+		} else if ($this->method == 'DELETE') {
+			if ($this->args[0]) {
+				//   /api/v1/workout/{{id}}
+            }
+        }
+		
+		error("404.2");
      }
 	 
     /**
@@ -58,14 +110,14 @@ class MyAPI extends API {
      */
      protected function exercise() {
         if ($this->method == 'GET') {
-			//  /api/v1/exercise/list/me
-			if ($this->args[0] == "me") {
-				return "me";
-			} 
-			
-			//  /api/v1/exercise/list
 			if ($this->verb == 'list') {
 			
+				//  /api/v1/exercise/list/me
+				if ($this->args[0] == "me") {
+					return "me";
+				} 
+				
+				//  /api/v1/exercise/list
 				$params = array(':id' => '1');
 				
 				$stmt = $this->pdo->prepare('
@@ -83,7 +135,6 @@ class MyAPI extends API {
 				return $this->args[0];
 			}
 			
-			return error("404.2");
         } else if ($this->method == 'POST') {
 			//   /api/v1/exercise/{{id}}/{{workoutId}}
          
@@ -92,7 +143,7 @@ class MyAPI extends API {
             
         }
 		
-		return error("404.2");
+		error("404.2");
      }
 	 		 
 	/**

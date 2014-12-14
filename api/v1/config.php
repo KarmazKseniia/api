@@ -4,7 +4,6 @@ function connect() {
 		$pdo = new PDO("mysql:host=localhost;dbname=uhealth;charset=utf8", 'root', '');
 	} catch (PDOException $e) {
 		error("404.1");
-		die();
 	}
 	return $pdo;
 }
@@ -15,13 +14,6 @@ function error($code) {
 		"404.2" => "Метод не поддерживается"
 	);
 
-	echo json_encode(
-		array( 
-			"error" => array(
-				"code" => $code,
-				"message" => $message[$code]
-			)
-		)
-	);
+	throw new Exception($message[$code]);
 }
 ?>
