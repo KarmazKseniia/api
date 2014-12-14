@@ -4,5 +4,6 @@ class Recipe {
 	public $title; 			// varchar 255
 	public $description; 	// text
 	public $steps; 			// text
+	public $productList;	// [Product]
 }
 ?>

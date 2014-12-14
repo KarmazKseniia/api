@@ -2,6 +2,7 @@
 require_once 'config.php';
 require_once 'API.class.php';
 
+require_once 'Recipe.class.php';
 require_once 'Product.class.php';
 require_once 'Exercise.class.php';
 require_once 'ImageExercise.class.php';
@@ -35,7 +36,49 @@ class MyAPI extends API {
         $this->User = $User; 
 		*/
     }
+
+		/**
+	 * /api/v1/recipe/list 			GET - список всех рецептов.
+	 * /api/v1/recipe/{{id}} 		GET - взять конкретный рецепт.
+	 */	
+	protected function recipe() {
+		if ($this->method == 'GET') {
+			if ($this->verb == 'list') {
+			
+				//  /api/v1/recipe/list
+				
+				$stmt = $this->pdo->prepare('
+				   SELECT * FROM recipe');
+				 
+				$stmt->execute();
+				$result = $stmt->fetchAll(PDO::FETCH_CLASS, 'Recipe');
+				
+				return $result;
+			}
+			
+			//  /api/v1/recipe/{{id}} 
+			if ($this->args[0]) {
+				$params = array(':id' => $this->args[0]);
+				
+				$stmt = $this->pdo->prepare('
+				   SELECT * FROM recipe
+				   WHERE id = :id');
+				 
+				$stmt->execute($params);
+				$result = $stmt->fetchAll(PDO::FETCH_CLASS, 'Recipe');
+				
+				return $result;
+			}
+			
+        }
+		
+		error("404.2");
+	}
 	
+	/**
+	 * /api/v1/product/list 		GET - список всех продуктов.
+	 * /api/v1/product/{{id}} 		GET - взять конкретный продукт.
+	 */	
 	protected function product() {
 		if ($this->method == 'GET') {
 			if ($this->verb == 'list') {
