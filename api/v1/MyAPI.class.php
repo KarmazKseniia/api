@@ -1,5 +1,6 @@
 <?php
 require_once 'config.php';
+require_once 'DB.class.php';
 require_once 'API.class.php';
 
 require_once 'Recipe.class.php';
@@ -9,16 +10,11 @@ require_once 'ImageExercise.class.php';
 require_once 'VideoExercise.class.php';
 require_once 'Workout.class.php';
 
-class MyAPI extends API
-{
+class MyAPI extends API {
     protected $User;
-    protected $pdo;
 
-    public function __construct($request, $origin)
-    {
+    public function __construct($request, $origin) {
         parent::__construct($request);
-
-        $this->pdo = connect();
 
         // Abstracted out for example
         //$APIKey = new Models\APIKey();
@@ -40,40 +36,38 @@ class MyAPI extends API
     }
 
     /**
-     * 1) /api/v1/recipe/list            GET - список всех рецептов.
+     * 1) /api/v1/recipe/list          GET - список всех рецептов.
      * 2) /api/v1/recipe/{{id}}        GET - взять конкретный рецепт.
-     * 3) /api/v1/recipe                POST - создать рецепт.
+     * 3) /api/v1/recipe               POST - создать рецепт.
      */
-    protected function recipe()
-    {
+    protected function recipe() {
         if ($this->method == 'GET') {
             if ($this->verb == 'list') { // (1)
-                return Recipe::getList($this->pdo);
+                return Recipe::getList();
             }
 
             if ($this->args[0]) { // (2)
-                return Recipe::get($this->pdo, $this->args[0]);
+                return Recipe::get($this->args[0]);
             }
         } else if ($this->method == 'POST') { // (3)
-            return Recipe::add($this->pdo);
+            return Recipe::add($this->request);
         }
 
         error("404.2");
     }
 
     /**
-     * 1) /api/v1/product/list            GET - список всех продуктов.
+     * 1) /api/v1/product/list          GET - список всех продуктов.
      * 2) /api/v1/product/{{id}}        GET - взять конкретный продукт.
      */
-    protected function product()
-    {
+    protected function product() {
         if ($this->method == 'GET') {
             if ($this->verb == 'list') { // (1)
-                return Product::getList($this->pdo);
+                return Product::getList();
             }
 
             if ($this->args[0]) { // (2)
-                return Product::get($this->pdo, $this->args[0]);
+                return Product::get($this->args[0]);
             }
 
         }
@@ -82,17 +76,16 @@ class MyAPI extends API
     }
 
     /**
-     * /api/v1/workout/list        GET - список всех тренировок.
-     * /api/v1/workout/list/me        GET - список моих тренировок.
-     * /api/v1/workout/{{id}}        GET - взять конкретную тренировку.
-     * /api/v1/workout/            POST - создать тренировку.
-     * /api/v1/workout/{{id}}        POST - добавить тренировку в аккаунт.
-     * /api/v1/workout/{{id}}        PUT - изменить тренировку.
-     * /api/v1/workout/{{id}}        DELETE - удалить тренировку из аккаунта.
+     * /api/v1/workout/list             GET - список всех тренировок.
+     * /api/v1/workout/list/me          GET - список моих тренировок.
+     * /api/v1/workout/{{id}}           GET - взять конкретную тренировку.
+     * /api/v1/workout/                 POST - создать тренировку.
+     * /api/v1/workout/{{id}}           POST - добавить тренировку в аккаунт.
+     * /api/v1/workout/{{id}}           PUT - изменить тренировку.
+     * /api/v1/workout/{{id}}           DELETE - удалить тренировку из аккаунта.
      * /api/v1/workout/{{id}}/{{workoutId}} POST - добавить упражнения одной тренировки в другую.
      */
-    protected function workout()
-    {
+    protected function workout() {
         if ($this->method == 'GET') {
             if ($this->verb == 'list') {
 
@@ -102,7 +95,7 @@ class MyAPI extends API
                 }
 
                 //  /api/v1/workout/list
-                $stmt = $this->pdo->prepare('
+                $stmt = DB::getInstance()->prepare('
 				   SELECT * FROM workout');
 
                 $stmt->execute();
@@ -115,7 +108,7 @@ class MyAPI extends API
             if ($this->args[0]) {
                 $params = array(':id' => $this->args[0]);
 
-                $stmt = $this->pdo->prepare('
+                $stmt = DB::getInstance()->prepare('
 				   SELECT * FROM workout
 				   WHERE id = :id');
 
@@ -155,14 +148,13 @@ class MyAPI extends API
     }
 
     /**
-     * /api/v1/exercise/list        GET - взять все упражнения.
-     * /api/v1/exercise/list/me        GET - взять все упражнения из аккаунта.
-     * /api/v1/exercise/{{id}}        GET - взять конкретное упражнение.
+     * /api/v1/exercise/list                GET - взять все упражнения.
+     * /api/v1/exercise/list/me             GET - взять все упражнения из аккаунта.
+     * /api/v1/exercise/{{id}}              GET - взять конкретное упражнение.
      * /api/v1/exercise/{{id}}/{{workoutId}} POST - добавить упражнение в тренировку.
      * /api/v1/exercise/{{id}}/{{workoutId}} DELETE - удалить упражнение из тренировки.
      */
-    protected function exercise()
-    {
+    protected function exercise() {
         if ($this->method == 'GET') {
             if ($this->verb == 'list') {
 
@@ -172,7 +164,7 @@ class MyAPI extends API
                 }
 
                 //  /api/v1/exercise/list
-                $stmt = $this->pdo->prepare('
+                $stmt = DB::getInstance()->prepare('
 				   SELECT * FROM exercise');
 
                 $stmt->execute();
@@ -185,7 +177,7 @@ class MyAPI extends API
             if ($this->args[0]) {
                 $params = array(':id' => $this->args[0]);
 
-                $stmt = $this->pdo->prepare('
+                $stmt = DB::getInstance()->prepare('
 				   SELECT * FROM exercise
 				   WHERE id = :id');
 
@@ -209,8 +201,7 @@ class MyAPI extends API
     /**
      * sport_type=1&muscule_group=2
      */
-    private function filter()
-    {
+    private function filter() {
 
     }
 }

@@ -1,23 +1,24 @@
 <?php
 class Product
 {
-    public $id; // unsigned bigint
-    public $title; // varchar 255
-    public $proteins; // float
-    public $fats; // float
-    public $carbohydrates; // float
-    public $kcal; // float
-    public $icon; // varchar 255
+    public $id;             // unsigned bigint
+    public $title;          // varchar 255
+    public $proteins;       // float
+    public $fats;           // float
+    public $carbohydrates;  // float
+    public $kcal;           // float
+    public $icon;           // varchar 255
 
     //public $mesurement;
     //public $categotyId;
 
     // GET: '/api/v1/product/{{id}}'
-    public static function get($pdo, $id)
-    {
+    public static function get($id) {
+        $db = DB::getInstance();
+
         $params = array(':id' => $id);
 
-        $stmt = $pdo->prepare('
+        $stmt = $db->prepare('
 		   SELECT * FROM product
 		   WHERE id = :id');
 
@@ -28,9 +29,10 @@ class Product
     }
 
     // GET: '/api/v1/product/list'
-    public static function getList($pdo)
-    {
-        $stmt = $pdo->prepare('
+    public static function getList() {
+        $db = DB::getInstance();
+
+        $stmt = $db->prepare('
 		   SELECT * FROM product');
 
         $stmt->execute();
@@ -40,8 +42,9 @@ class Product
     }
 
     // POST: '/api/v1/product'
-    public static function add($pdo)
-    {
+    public static function add() {
+        $db = DB::getInstance();
+
         $params = array( /*
 			':title' => $this->args[0],
 			':proteins' => $this->args[1],
@@ -50,12 +53,12 @@ class Product
 			':kcal' => $this->args[4]*/
         );
 
-        $stmt = $pdo->prepare('
+        $stmt = $db->prepare('
 			   INSERT INTO product (title, proteins, fats, carbohydrates, kcal)
 			   VALUES (:title, :proteins, :fats, :carbohydrates, :kcal)');
 
         $stmt->execute($params);
-        $productId = $pdo->lastInsertId();
+        $productId = $db->lastInsertId();
 
         return array('productId' => $productId);
     }
