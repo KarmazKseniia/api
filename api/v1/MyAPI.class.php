@@ -37,75 +37,39 @@ class MyAPI extends API {
 		*/
     }
 
-		/**
-	 * /api/v1/recipe/list 			GET - список всех рецептов.
-	 * /api/v1/recipe/{{id}} 		GET - взять конкретный рецепт.
+	/**
+	 * 1) /api/v1/recipe/list 			GET - список всех рецептов.
+	 * 2) /api/v1/recipe/{{id}} 		GET - взять конкретный рецепт.
+	 * 3) /api/v1/recipe  				POST - создать рецепт.
 	 */	
 	protected function recipe() {
 		if ($this->method == 'GET') {
-			if ($this->verb == 'list') {
-			
-				//  /api/v1/recipe/list
-				
-				$stmt = $this->pdo->prepare('
-				   SELECT * FROM recipe');
-				 
-				$stmt->execute();
-				$result = $stmt->fetchAll(PDO::FETCH_CLASS, 'Recipe');
-				
-				return $result;
+			if ($this->verb == 'list') { // (1)
+				return Recipe::getList();
 			}
 			
-			//  /api/v1/recipe/{{id}} 
-			if ($this->args[0]) {
-				$params = array(':id' => $this->args[0]);
-				
-				$stmt = $this->pdo->prepare('
-				   SELECT * FROM recipe
-				   WHERE id = :id');
-				 
-				$stmt->execute($params);
-				$result = $stmt->fetchAll(PDO::FETCH_CLASS, 'Recipe');
-				
-				return $result;
+			if ($this->args[0]) { // (2)
+				return Recipe::get($this->args[0]);
 			}
-			
-        }
+        } else if ($this->method == 'POST') { // (3)
+			return Recipe::add();
+		}
 		
 		error("404.2");
 	}
 	
 	/**
-	 * /api/v1/product/list 		GET - список всех продуктов.
-	 * /api/v1/product/{{id}} 		GET - взять конкретный продукт.
+	 * 1) /api/v1/product/list 			GET - список всех продуктов.
+	 * 2) /api/v1/product/{{id}} 		GET - взять конкретный продукт.
 	 */	
 	protected function product() {
 		if ($this->method == 'GET') {
-			if ($this->verb == 'list') {
-			
-				//  /api/v1/product/list
-				
-				$stmt = $this->pdo->prepare('
-				   SELECT * FROM product');
-				 
-				$stmt->execute();
-				$result = $stmt->fetchAll(PDO::FETCH_CLASS, 'Product');
-				
-				return $result;
+			if ($this->verb == 'list') { // (1)
+				return Product::getList();
 			}
 			
-			//  /api/v1/product/{{id}} 
-			if ($this->args[0]) {
-				$params = array(':id' => $this->args[0]);
-				
-				$stmt = $this->pdo->prepare('
-				   SELECT * FROM product
-				   WHERE id = :id');
-				 
-				$stmt->execute($params);
-				$result = $stmt->fetchAll(PDO::FETCH_CLASS, 'Product');
-				
-				return $result;
+			if ($this->args[0]) { // (2)
+				return Product::get($this->args[0]);
 			}
 			
         }
