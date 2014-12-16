@@ -38,7 +38,7 @@ class Product
         $stmt->execute();
         $result = $stmt->fetchAll(PDO::FETCH_CLASS, 'Product');
 
-        return $result;
+        return array('products' => $result);
     }
 
     // POST: '/api/v1/product'

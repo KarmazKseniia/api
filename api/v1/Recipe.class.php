@@ -70,11 +70,11 @@ class Recipe {
 
             $db->beginTransaction();
 
-            foreach ($params["productId"] as $i => $productId) {
+            foreach ($params["ingredients"] as $ingredient) {
                 $result = $stmtProductList->execute(array(
                     ':recipeId' => $recipeId,
-                    ':productId' => $productId,
-                    ':amount' => $params["productAmount"][$i]
+                    ':productId' => $ingredient["id"],
+                    ':amount' => $ingredient["amount"]
                 ));
                 if (!$result) new PDOException();
             }
