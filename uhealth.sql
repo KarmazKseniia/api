@@ -98,8 +98,8 @@ CREATE TABLE IF NOT EXISTS `workoutschedule` (
   `userId` int(10) unsigned NOT NULL,
   `weekDay` enum('Mon','Tue','Wed','Thu','Fri','Sat','Sun') NOT NULL,
   `workoutId` bigint(20) unsigned NOT NULL,
-  PRIMARY KEY (`userId`,`day`,`workoutId`),
-  KEY `userId` (`userId`,`day`),
+  PRIMARY KEY (`userId`,`weekDay`,`workoutId`),
+  KEY `userId` (`userId`,`weekDay`),
   KEY `workoutId` (`workoutId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
