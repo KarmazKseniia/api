@@ -55,19 +55,15 @@ class Recipe {
                INSERT INTO recipeproductlist (recipeId, productId, amount)
                VALUES (:recipeId, :productId, :amount)');
 
-        try {
-            $db->beginTransaction();
-
-            $stmtRecipe->execute(array(
-                ':title' => $params["title"],
-                ':description' => $params["description"],
-                ':steps' => $params["steps"]
-            ));
-
-            $recipeId = $db->lastInsertId();
-
-            $db->commit();
-
+        
+        $stmtRecipe->execute(array(
+            ':title' => $params["title"],
+            ':description' => $params["description"],
+            ':steps' => $params["steps"]
+        ));
+        $recipeId = $db->lastInsertId();
+		
+		try {
             $db->beginTransaction();
 
             foreach ($params["ingredients"] as $ingredient) {
