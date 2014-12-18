@@ -18,12 +18,12 @@ class Product
 
         $params = array(':id' => $id);
 
-        $stmt = $db->prepare('
+        $stmtGetProduct = $db->prepare('
 		   SELECT * FROM product
 		   WHERE id = :id');
 
-        $stmt->execute($params);
-        $result = $stmt->fetchAll(PDO::FETCH_CLASS, 'Product');
+        $stmtGetProduct->execute($params);
+        $result = $stmtGetProduct->fetchAll(PDO::FETCH_CLASS, 'Product');
 
         return $result;
     }
@@ -32,36 +32,71 @@ class Product
     public static function getList() {
         $db = DB::getInstance();
 
-        $stmt = $db->prepare('
+        $stmtGetProductList = $db->prepare('
 		   SELECT * FROM product');
 
-        $stmt->execute();
-        $result = $stmt->fetchAll(PDO::FETCH_CLASS, 'Product');
+        $stmtGetProductList->execute();
+        $result = $stmtGetProductList->fetchAll(PDO::FETCH_CLASS, 'Product');
 
         return array('products' => $result);
     }
 
     // POST: '/api/v1/product'
-    public static function add() {
+	// BODY: title, proteins, fats, carbohydrates, kcal
+    public static function add($params) {
         $db = DB::getInstance();
 
-        $params = array( /*
-			':title' => $this->args[0],
-			':proteins' => $this->args[1],
-			':fats' => $this->args[2],
-			':carbohydrates' => $this->args[3],
-			':kcal' => $this->args[4]*/
+        $params = array(
+			':title' => $params["title"],
+			':proteins' => $params["proteins"],
+			':fats' => $params["fats"],
+			':carbohydrates' => $params["carbohydrates"],
+			':kcal' => $params["kcal"]
         );
 
-        $stmt = $db->prepare('
+        $stmtAddProduct = $db->prepare('
 			   INSERT INTO product (title, proteins, fats, carbohydrates, kcal)
 			   VALUES (:title, :proteins, :fats, :carbohydrates, :kcal)');
 
-        $stmt->execute($params);
+        $stmtAddProduct->execute($params);
         $productId = $db->lastInsertId();
 
         return array('productId' => $productId);
     }
+	
+	// PUT: '/api/v1/product/{{id}}'
+    // BODY: title, proteins, fats, carbohydrates, kcal
+	public static function update($id, $params) {
+	$db = DB::getInstance();
+
+        $params = array(
+			':id' => $id,
+			':title' => $params["title"],
+			':proteins' => $params["proteins"],
+			':fats' => $params["fats"],
+			':carbohydrates' => $params["carbohydrates"],
+			':kcal' => $params["kcal"]
+        );
+
+        $stmtUpdateProduct = $db->prepare('
+			   UPDATE product 
+			   SET title = :title, proteins = :proteins, fats = :fats, carbohydrates = :carbohydrates, kcal = :kcal
+			   WHERE id = :id');
+
+        return $stmtUpdateProduct->execute($params);
+	}
+	
+	// DELETE: '/api/v1/product/{{id}}'
+    public static function delete($id) {
+		$db = DB::getInstance();
+		$params = array(':id' => $id);
+		
+        $stmtDeleteProduct = $db->prepare('
+		   DELETE FROM product
+		   WHERE id = :id');
+
+        return $stmtDeleteProduct->execute($params);
+	}
 }
 
 ?>

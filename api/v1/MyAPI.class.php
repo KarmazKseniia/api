@@ -74,17 +74,34 @@ class MyAPI extends API {
     /**
      * 1) /api/v1/product/list          GET - список всех продуктов.
      * 2) /api/v1/product/{{id}}        GET - взять конкретный продукт.
+	 * 3) /api/v1/product               POST - создать продукт.
+     * 4) /api/v1/product/{{id}}        PUT - изменить продукт.
+     * 5) /api/v1/product/{{id}}        DELETE - удалить продукт.
      */
     protected function product() {
+		$id = $this->args[0];
+	
         if ($this->method == 'GET') {
-            if 	($this->verb == 'list') { // (1)
+            if ($this->verb == 'list') { // (1)
                 return Product::getList();
             }
 
-            if ($this->args[0]) { // (2)
-                return Product::get($this->args[0]);
+            if ($id) { // (2)
+                return Product::get($id);
             }
 
+        } else if ($this->method == 'POST') { // (3)
+            return Product::add($this->request);
+			
+        } else if ($this->method == 'PUT') { // (4)
+			if ($id) {
+				return Product::update($id, $this->request);
+			}
+			
+        } else if ($this->method == 'DELETE') { // (5)
+            if ($id) {
+				return Product::delete($id);
+			}
         }
 
         error("404.2");

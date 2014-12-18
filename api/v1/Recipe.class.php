@@ -108,7 +108,8 @@ class Recipe {
 			   
         $stmtUpdateIngredient = $db->prepare('
                UPDATE recipeproductlist
-			   SET recipeId = :recipeId, productId = :productId, amount = :amount');
+			   SET amount = :amount
+			   WHERE recipeId = :recipeId && productId = :productId');
 			
         
         $stmtUpdateRecipe->execute(array(
@@ -140,9 +141,6 @@ class Recipe {
                 ':amount' => $ingredient["amount"]
             ));
         }
-		
-        return array( 'recipeId' => $recipeId );
-
 	}
 	
 	// DELETE: '/api/v1/recipe/{{id}}'
@@ -150,11 +148,11 @@ class Recipe {
 		$db = DB::getInstance();
 		$params = array(':id' => $id);
 		
-        $stmtRecipe = $db->prepare('
+        $stmtDeleteRecipe = $db->prepare('
 		   DELETE FROM recipe
 		   WHERE id = :id');
 
-        return $stmtRecipe->execute($params);
+        return $stmtDeleteRecipe->execute($params);
 	}
 }
 ?>
