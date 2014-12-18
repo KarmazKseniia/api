@@ -12,12 +12,12 @@ class Recipe {
         $db = DB::getInstance();
         $params = array(':id' => $id);
 
-        $stmtRecipe = $db->prepare('
+        $stmtGetRecipe = $db->prepare('
 		   SELECT * FROM recipe
 		   WHERE id = :id');
 
-        $stmtRecipe->execute($params);
-        $recipe = $stmtRecipe->fetchAll(PDO::FETCH_CLASS, 'Recipe');
+        $stmtGetRecipe->execute($params);
+        $recipe = $stmtGetRecipe->fetchAll(PDO::FETCH_CLASS, 'Recipe');
 
         $stmtProductList = $db->prepare('
 		   SELECT * FROM recipeproductlist
@@ -34,29 +34,30 @@ class Recipe {
     // GET: '/api/v1/recipe/list'
     public static function getList() {
         $db = DB::getInstance();
-        $stmt = $db->prepare('
+        $stmtGetRecipeList = $db->prepare('
 		   SELECT * FROM recipe');
 
-        $stmt->execute();
-        $result = $stmt->fetchAll(PDO::FETCH_CLASS, 'Recipe');
+        $stmtGetRecipeList->execute();
+        $result = $stmtGetRecipeList->fetchAll(PDO::FETCH_CLASS, 'Recipe');
 
         return $result;
     }
 
     // POST: '/api/v1/recipe'
-    // BODY: array(title, description, steps, productId[], productAmount[])
+    // BODY: array(title, description, steps, 
+	// 			ingredients[productId, amount])
     public static function add($params) {
         $db = DB::getInstance();
-        $stmtRecipe = $db->prepare('
+        $stmtAddRecipe = $db->prepare('
                INSERT INTO recipe (title, description, steps)
                VALUES (:title, :description, :steps)');
 
-        $stmtProductList = $db->prepare('
+        $stmtAddIngredient = $db->prepare('
                INSERT INTO recipeproductlist (recipeId, productId, amount)
                VALUES (:recipeId, :productId, :amount)');
 
         
-        $stmtRecipe->execute(array(
+        $stmtAddRecipe->execute(array(
             ':title' => $params["title"],
             ':description' => $params["description"],
             ':steps' => $params["steps"]
@@ -67,7 +68,7 @@ class Recipe {
             $db->beginTransaction();
 
             foreach ($params["ingredients"] as $ingredient) {
-                $result = $stmtProductList->execute(array(
+                $result = $stmtAddIngredient->execute(array(
                     ':recipeId' => $recipeId,
                     ':productId' => $ingredient["id"],
                     ':amount' => $ingredient["amount"]
@@ -84,6 +85,76 @@ class Recipe {
             error("404.2");
         }
     }
-}
 
+	// PUT: '/api/v1/recipe/{{id}}'
+    // BODY: array(title, description, steps, 
+	// 			ingredientsToDelete[productId], 
+	// 			ingredientsToAdd[productId, amount])
+	// 			ingredientsToUpdate[productId, amount])
+	public static function update($id, $params) {
+		$db = DB::getInstance();
+        $stmtUpdateRecipe = $db->prepare('
+               UPDATE recipe
+			   SET title = :title, description = :description, steps = :steps
+			   WHERE id=:id');
+
+		$stmtDeleteIngredient = $db->prepare('
+               DELETE FROM recipeproductlist
+               WHERE recipeId = :recipeId and productId = :productId');
+
+		$stmtAddIngredient = $db->prepare('
+               INSERT INTO recipeproductlist (recipeId, productId, amount)
+               VALUES (:recipeId, :productId, :amount)');
+			   
+        $stmtUpdateIngredient = $db->prepare('
+               UPDATE recipeproductlist
+			   SET recipeId = :recipeId, productId = :productId, amount = :amount');
+			
+        
+        $stmtUpdateRecipe->execute(array(
+			':id' => $id,
+            ':title' => $params["title"],
+            ':description' => $params["description"],
+            ':steps' => $params["steps"]
+        ));
+		
+		foreach ($params["ingredientsToDelete"] as $ingredient) {
+			$stmtDeleteIngredient->execute(array(
+				':recipeId' => $id,
+				':productId' => $ingredient["id"]
+			));
+		}
+		
+        foreach ($params["ingredientsToAdd"] as $ingredient) {
+            $stmtAddIngredient->execute(array(
+                ':recipeId' => $id,
+                ':productId' => $ingredient["id"],
+                ':amount' => $ingredient["amount"]
+            ));
+        }
+
+		foreach ($params["ingredientsToUpdate"] as $ingredient) {
+            $stmtUpdateRecipe->execute(array(
+                ':recipeId' => $id,
+                ':productId' => $ingredient["id"],
+                ':amount' => $ingredient["amount"]
+            ));
+        }
+		
+        return array( 'recipeId' => $recipeId );
+
+	}
+	
+	// DELETE: '/api/v1/recipe/{{id}}'
+    public static function delete($id) {
+		$db = DB::getInstance();
+		$params = array(':id' => $id);
+		
+        $stmtRecipe = $db->prepare('
+		   DELETE FROM recipe
+		   WHERE id = :id');
+
+        return $stmtRecipe->execute($params);
+	}
+}
 ?>
