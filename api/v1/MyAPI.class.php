@@ -39,18 +39,33 @@ class MyAPI extends API {
      * 1) /api/v1/recipe/list          GET - список всех рецептов.
      * 2) /api/v1/recipe/{{id}}        GET - взять конкретный рецепт.
      * 3) /api/v1/recipe               POST - создать рецепт.
+     * 4) /api/v1/recipe/{{id}}        PUT - изменить рецепт.
+     * 5) /api/v1/recipe/{{id}}        DELETE - удалить рецепт.
      */
     protected function recipe() {
+		$id = $this->args[0];
+		
         if ($this->method == 'GET') {
             if ($this->verb == 'list') { // (1)
                 return Recipe::getList();
             }
 
-            if ($this->args[0]) { // (2)
-                return Recipe::get($this->args[0]);
+            if ($id) { // (2)
+                return Recipe::get($id);
             }
+			
         } else if ($this->method == 'POST') { // (3)
             return Recipe::add($this->request);
+			
+        } else if ($this->method == 'PUT') { // (4)
+			if ($id) {
+				return Recipe::update($id, $this->request);
+			}
+			
+        } else if ($this->method == 'DELETE') { // (5)
+            if ($id) {
+				return Recipe::delete($id);
+			}
         }
 
         error("404.2");
@@ -62,7 +77,7 @@ class MyAPI extends API {
      */
     protected function product() {
         if ($this->method == 'GET') {
-            if ($this->verb == 'list') { // (1)
+            if 	($this->verb == 'list') { // (1)
                 return Product::getList();
             }
 
