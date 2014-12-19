@@ -71,11 +71,11 @@ class Product
 
         $params = array(
 			':id' => $id,
-			':title' => $params["title"],
-			':proteins' => $params["proteins"],
-			':fats' => $params["fats"],
-			':carbohydrates' => $params["carbohydrates"],
-			':kcal' => $params["kcal"]
+			':title' => $params->title,
+			':proteins' => $params->proteins,
+			':fats' => $params->fats,
+			':carbohydrates' => $params->carbohydrates,
+			':kcal' => $params->kcal
         );
 
         $stmtUpdateProduct = $db->prepare('

@@ -26,7 +26,7 @@ class Recipe {
         $stmtProductList->execute($params);
         $productList = $stmtProductList->fetchAll();
 
-        $recipe->productList = $productList;
+        $recipe["productList"] = $productList;
 
         return $recipe;
     }
@@ -58,20 +58,20 @@ class Recipe {
 
         
         $stmtAddRecipe->execute(array(
-            ':title' => $params["title"],
-            ':description' => $params["description"],
-            ':steps' => $params["steps"]
+            ':title' => $params->title,
+            ':description' => $params->description,
+            ':steps' => $params->steps
         ));
         $recipeId = $db->lastInsertId();
 		
 		try {
             $db->beginTransaction();
 
-            foreach ($params["ingredients"] as $ingredient) {
+            foreach ($params->ingredients as $ingredient) {
                 $result = $stmtAddIngredient->execute(array(
                     ':recipeId' => $recipeId,
-                    ':productId' => $ingredient["id"],
-                    ':amount' => $ingredient["amount"]
+                    ':productId' => $ingredient->id,
+                    ':amount' => $ingredient->amount
                 ));
                 if (!$result) new PDOException();
             }
@@ -114,31 +114,31 @@ class Recipe {
         
         $stmtUpdateRecipe->execute(array(
 			':id' => $id,
-            ':title' => $params["title"],
-            ':description' => $params["description"],
-            ':steps' => $params["steps"]
+            ':title' => $params->title,
+            ':description' => $params->description,
+            ':steps' => $params->steps
         ));
 		
-		foreach ($params["ingredientsToDelete"] as $ingredient) {
+		foreach ($params->ingredientsToDelete as $ingredient) {
 			$stmtDeleteIngredient->execute(array(
 				':recipeId' => $id,
-				':productId' => $ingredient["id"]
+				':productId' => $ingredient->id
 			));
 		}
 		
-        foreach ($params["ingredientsToAdd"] as $ingredient) {
+        foreach ($params->ingredientsToAdd as $ingredient) {
             $stmtAddIngredient->execute(array(
                 ':recipeId' => $id,
-                ':productId' => $ingredient["id"],
-                ':amount' => $ingredient["amount"]
+                ':productId' => $ingredient->id,
+                ':amount' => $ingredient->amount
             ));
         }
 
-		foreach ($params["ingredientsToUpdate"] as $ingredient) {
+		foreach ($params->ingredientsToUpdate as $ingredient) {
             $stmtUpdateRecipe->execute(array(
                 ':recipeId' => $id,
-                ':productId' => $ingredient["id"],
-                ':amount' => $ingredient["amount"]
+                ':productId' => $ingredient->id,
+                ':amount' => $ingredient->amount
             ));
         }
 	}
