@@ -9,7 +9,7 @@ class Product
     public $kcal;           // float
     public $icon;           // varchar 255
 
-    //public $mesurement;
+    public $mesurement;     // enum('кг', 'л', 'ст.л.', 'ч.л.', 'стак.')
     //public $categotyId;
 
     // GET: '/api/v1/product/{{id}}'
@@ -45,13 +45,13 @@ class Product
 	// BODY: title, proteins, fats, carbohydrates, kcal
     public static function add($params) {
         $db = DB::getInstance();
-
+	
         $params = array(
-			':title' => $params["title"],
-			':proteins' => $params["proteins"],
-			':fats' => $params["fats"],
-			':carbohydrates' => $params["carbohydrates"],
-			':kcal' => $params["kcal"]
+			':title' => $params->title,
+			':proteins' => $params->proteins,
+			':fats' => $params->fats,
+			':carbohydrates' => $params->carbohydrates,
+			':kcal' => $params->kcal
         );
 
         $stmtAddProduct = $db->prepare('
