@@ -28,7 +28,7 @@ class Recipe {
 
         $recipe["productList"] = $productList;
 
-        return $recipe;
+        return array('recipe' => $recipe);
     }
 
     // GET: '/api/v1/recipe/list'
@@ -40,7 +40,7 @@ class Recipe {
         $stmtGetRecipeList->execute();
         $result = $stmtGetRecipeList->fetchAll(PDO::FETCH_CLASS, 'Recipe');
 
-        return $result;
+        return array('recipes' => $result);
     }
 
     // POST: '/api/v1/recipe'
@@ -77,13 +77,12 @@ class Recipe {
             }
 
             $db->commit();
-
-            return array( 'recipeId' => $recipeId );
-
         } catch(PDOException $e) {
             $db->rollback();
             error("404.2");
         }
+		
+		return array( 'recipeId' => $recipeId );
     }
 
 	// PUT: '/api/v1/recipe/{{id}}'
@@ -112,35 +111,48 @@ class Recipe {
 			   WHERE recipeId = :recipeId && productId = :productId');
 			
         
-        $stmtUpdateRecipe->execute(array(
+        $result = $stmtUpdateRecipe->execute(array(
 			':id' => $id,
             ':title' => $params->title,
             ':description' => $params->description,
             ':steps' => $params->steps
         ));
 		
-		foreach ($params->ingredientsToDelete as $ingredient) {
-			$stmtDeleteIngredient->execute(array(
-				':recipeId' => $id,
-				':productId' => $ingredient->id
-			));
-		}
+		if (!$result) return array( "result" => false );
 		
-        foreach ($params->ingredientsToAdd as $ingredient) {
-            $stmtAddIngredient->execute(array(
-                ':recipeId' => $id,
-                ':productId' => $ingredient->id,
-                ':amount' => $ingredient->amount
-            ));
-        }
-
-		foreach ($params->ingredientsToUpdate as $ingredient) {
-            $stmtUpdateRecipe->execute(array(
-                ':recipeId' => $id,
-                ':productId' => $ingredient->id,
-                ':amount' => $ingredient->amount
-            ));
-        }
+		try { 
+		  $db->beginTransaction();
+		  
+		  foreach ($params->ingredientsToDelete as $ingredient) {
+		  	$stmtDeleteIngredient->execute(array(
+		  		':recipeId' => $id,
+		  		':productId' => $ingredient->id
+		  	));
+		  }
+		  
+          foreach ($params->ingredientsToAdd as $ingredient) {
+              $stmtAddIngredient->execute(array(
+                  ':recipeId' => $id,
+                  ':productId' => $ingredient->id,
+                  ':amount' => $ingredient->amount
+              ));
+          }
+          
+		  foreach ($params->ingredientsToUpdate as $ingredient) {
+              $stmtUpdateRecipe->execute(array(
+                  ':recipeId' => $id,
+                  ':productId' => $ingredient->id,
+                  ':amount' => $ingredient->amount
+              ));
+          }
+		  
+		  $db->commit();
+		  return array( "result" => true );
+		  
+		} catch(PDOExecption $e) { 
+			$db->rollback(); 
+			return array( "result" => false ); 
+		}
 	}
 	
 	// DELETE: '/api/v1/recipe/{{id}}'
@@ -152,7 +164,7 @@ class Recipe {
 		   DELETE FROM recipe
 		   WHERE id = :id');
 
-        return $stmtDeleteRecipe->execute($params);
+        return array( "result" => $stmtDeleteRecipe->execute($params) );
 	}
 }
 ?>

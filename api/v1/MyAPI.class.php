@@ -95,7 +95,7 @@ class MyAPI extends API {
 			
         } else if ($this->method == 'PUT') { // (4)
 			if ($id) {
-				return Product::update($id, $this->request);
+				return Product::update($id, json_decode($this->file));
 			}
 			
         } else if ($this->method == 'DELETE') { // (5)

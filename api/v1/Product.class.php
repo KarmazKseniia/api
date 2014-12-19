@@ -25,7 +25,7 @@ class Product
         $stmtGetProduct->execute($params);
         $result = $stmtGetProduct->fetchAll(PDO::FETCH_CLASS, 'Product');
 
-        return $result;
+        return array('product' => $result);
     }
 
     // GET: '/api/v1/product/list'
@@ -67,8 +67,8 @@ class Product
 	// PUT: '/api/v1/product/{{id}}'
     // BODY: title, proteins, fats, carbohydrates, kcal
 	public static function update($id, $params) {
-	$db = DB::getInstance();
-
+		$db = DB::getInstance();
+		
         $params = array(
 			':id' => $id,
 			':title' => $params->title,
@@ -83,7 +83,7 @@ class Product
 			   SET title = :title, proteins = :proteins, fats = :fats, carbohydrates = :carbohydrates, kcal = :kcal
 			   WHERE id = :id');
 
-        return $stmtUpdateProduct->execute($params);
+        return array( "result" => $stmtUpdateProduct->execute($params) );
 	}
 	
 	// DELETE: '/api/v1/product/{{id}}'
@@ -95,7 +95,7 @@ class Product
 		   DELETE FROM product
 		   WHERE id = :id');
 
-        return $stmtDeleteProduct->execute($params);
+        return array( "result" => $stmtDeleteProduct->execute($params) );
 	}
 }
 
