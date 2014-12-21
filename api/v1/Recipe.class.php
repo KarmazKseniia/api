@@ -1,11 +1,13 @@
 <?php
 class Recipe {
-    public $id;          // unsigned bigint
-    public $title;       // varchar 255
-    public $description; // text
-    public $steps;       // text
-    public $productList; // [Product]
-
+    public $id;                 // unsigned bigint
+    public $title;              // varchar 255
+    public $description;        // text
+    public $steps;              // text
+    public $productList;        // [Product]
+    public $complexity;         // unsigned tinyint
+    public $preparationTime;    // time
+    public $cookingTime;        // time
 
     // GET: '/api/v1/recipe/{{id}}'
     public static function get($id) {
@@ -49,8 +51,8 @@ class Recipe {
     public static function add($params) {
         $db = DB::getInstance();
         $stmtAddRecipe = $db->prepare('
-               INSERT INTO recipe (title, description, steps)
-               VALUES (:title, :description, :steps)');
+               INSERT INTO recipe (title, description, steps, complexity, preparationTime, cookingTime)
+               VALUES (:title, :description, :steps, :complexity, :preparationTime, :cookingTime)');
 
         $stmtAddIngredient = $db->prepare('
                INSERT INTO recipeproductlist (recipeId, productId, amount)
@@ -60,7 +62,10 @@ class Recipe {
         $stmtAddRecipe->execute(array(
             ':title' => $params->title,
             ':description' => $params->description,
-            ':steps' => $params->steps
+            ':steps' => $params->steps,
+            ':complexity' => $params->complexity,
+            ':preparationTime' => $params->preparationTime,
+            ':cookingTime' => $params->cookingTime
         ));
         $recipeId = $db->lastInsertId();
 		
@@ -94,7 +99,8 @@ class Recipe {
 		$db = DB::getInstance();
         $stmtUpdateRecipe = $db->prepare('
                UPDATE recipe
-			   SET title = :title, description = :description, steps = :steps
+			   SET title = :title, description = :description, steps = :steps, complexity = :complexity,
+			          preparationTime = :preparationTime, cookingTime = :cookingTime
 			   WHERE id=:id');
 
 		$stmtDeleteIngredient = $db->prepare('
@@ -115,7 +121,10 @@ class Recipe {
 			':id' => $id,
             ':title' => $params->title,
             ':description' => $params->description,
-            ':steps' => $params->steps
+            ':steps' => $params->steps,
+            ':complexity' => $params->complexity,
+            ':preparationTime' => $params->preparationTime,
+            ':cookingTime' => $params->cookingTime
         ));
 		
 		if (!$result) return array( "result" => false );
