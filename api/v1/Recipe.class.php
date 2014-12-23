@@ -22,14 +22,15 @@ class Recipe {
         $recipe = $stmtGetRecipe->fetchAll(PDO::FETCH_CLASS, 'Recipe');
 
         $stmtProductList = $db->prepare('
-		   SELECT * FROM recipeproductlist
+		   SELECT * FROM recipeproductlist as l
+		   LEFT JOIN product as p ON l.productId = p.id
 		   WHERE recipeId = :id');
 
         $stmtProductList->execute($params);
         $productList = $stmtProductList->fetchAll();
-
-        $recipe["productList"] = $productList;
-
+        
+        $recipe[0]->productList = $productList;
+        
         return array('recipe' => $recipe);
     }
 
